@@ -39,56 +39,66 @@ class StratzQuery:
                     skip: 0,
                     take: 100
                     }}) {{
-                    id
-                    didRadiantWin
-                    durationSeconds
-                    startDateTime
-                    firstBloodTime
-                    averageRank
-                    players {{
-                        steamAccountId
-                        steamAccount {{
-                        rankShift
-                        isAnonymous
-                        isStratzPublic
-                        seasonRank
-                        }}
-                        hero {{
-                        displayName
-                        }}
-                    }}
-                    playbackData {{
-                        wardEvents {{
-                        indexId
-                        time
-                        positionX
-                        positionY
-                        fromPlayer
-                        wardType
-                        action
-                        playerDestroyed
-                        }}
-                        towerDeathEvents {{
-                        time
-                        radiant
-                        dire
-                        }}
-                    }}
-                    averageImp
-                    actualRank
-                    averageRank
-                    radiantKills
-                    direKills
-                    radiantTeam {{
                         id
-                        name
-                        countryName
-                    }}
-                    direTeam {{
-                        id
-                        name
-                        countryName
-                    }}
+                        didRadiantWin
+                        durationSeconds
+                        startDateTime
+                        firstBloodTime
+                        averageRank
+                        players {{
+                            playerSlot
+                            isRadiant
+                            steamAccountId
+                            steamAccount {{
+                            rankShift
+                            isAnonymous
+                            isStratzPublic
+                            seasonRank
+                            }}
+                            hero {{
+                                displayName
+                            }}
+                            playbackData {{
+                                deathEvents {{
+                                    time
+                                    isWardWalkThrough
+                                    positionX
+                                    positionY
+                                }}
+                            }}
+                        }}
+                        playbackData {{
+                            wardEvents {{
+                            indexId
+                            time
+                            positionX
+                            positionY
+                            fromPlayer
+                            wardType
+                            action
+                            playerDestroyed
+                            }}
+                            towerDeathEvents {{
+                            time
+                            radiant
+                            dire
+                            }}
+                        }}
+                        averageImp
+                        actualRank
+                        averageRank
+                        radiantKills
+                        direKills
+                        radiantTeam {{
+                            id
+                            name
+                            countryName
+                        }}
+                        direTeam {{
+                            id
+                            name
+                            countryName
+                        }}
                     }}
                 }}
             }}
