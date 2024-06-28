@@ -15,15 +15,17 @@ class StratzQuery:
             "query": graphql_query
         }
         json_data = json.dumps(data)
-        response = requests.post(url=self.stratz_graphql_url, headers=self.headers, data=json_data)
+        response = requests.post(url=self.stratz_graphql_url, headers=self.headers, data=json_data, timeout=300)
         response.raise_for_status()
         result = response.json()
         return result
     
-    def get_professional_league(self, league_id):
+    def get_professional_league(self, league_ids):
         graphql_query = f"""
         {{
-            league (id: {league_id}) {{
+            leagues (request: {{
+                leagueIds: {league_ids},
+            }}) {{
                 id
                 name
                 banner

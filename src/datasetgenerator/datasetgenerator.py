@@ -91,27 +91,34 @@ class DatasetGenerator:
         df = pd.DataFrame.from_dict(matches_df_format)
         self.csv_add_match(df)
         
-    def get_professional_league(self, league_id, load_from_json=True):
-        loaded = False
+    def get_professional_league(self, league_ids: list, update_leagues_json=False) -> dict:
+
+        leagues_path = f"temp{os.sep}leagues"
+        if not os.path.isdir(leagues_path):
+            os.mkdir(leagues_path)
+
+        # find ausent json leagues
+        json_leagues_ids = os.listdir(leagues_path)
+        not_in_json_leagues = [id for id in league_ids if f"{id}.json" not in json_leagues_ids]
+
+        # if update leagues, then treat all like its not have a json 
+        if update_leagues_json:
+            not_in_json_leagues = league_ids
+
+        # get ausent json leagues
         leagues = {}
+        if not_in_json_leagues:
+            downloaded_leagues = self.querier.get_professional_league(not_in_json_leagues)['data']['leagues']
+            for d_l in downloaded_leagues:
+                with open(f'{leagues_path}{os.sep}{d_l["id"]}.json', 'w') as f:
+                    json.dump(d_l, f)
 
-        if load_from_json:
-            try:
-                with open('temp'+os.sep+'leagues.json', 'r') as f:
-                    leagues = json.loads(f.read())
-                
-                league = leagues[str(league_id)]
-                loaded = True
-            except Exception as e:
-                print(e)
-                pass
-
-        if not loaded:
-            league = self.querier.get_professional_league(league_id)['data']['league']
-            with open('temp'+os.sep+'leagues.json', 'w') as f:
-                leagues[league_id] = league
-                json.dump(leagues, f)
-
+        # load leagues from json
+        leagues = {}
+        for league_id in league_ids:
+            with open(f'{leagues_path}{os.sep}{league_id}.json', 'r') as f:
+                league = json.loads(f.read())
+            leagues[league_id] = league
 
         # matches = []
         # for match in league['matches']:
@@ -121,4 +128,4 @@ class DatasetGenerator:
         # matches = [filter_match(match) for match in matches]
         # self.add_matches(matches)
 
-        return league
+        return leagues
