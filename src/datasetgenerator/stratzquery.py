@@ -20,11 +20,11 @@ class StratzQuery:
         result = response.json()
         return result
     
-    def get_professional_league(self, league_ids):
+    def get_professional_league(self, league_id):
         graphql_query = f"""
         {{
             leagues (request: {{
-                leagueIds: {league_ids},
+                leagueId: {league_id},
             }}) {{
                 id
                 name

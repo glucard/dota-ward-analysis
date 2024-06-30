@@ -32,22 +32,10 @@ def filter_match(match_data):
     return match_data
 
 class DatasetGenerator:
-    def __init__(self, stratz_token, csv_path):
+    def __init__(self, stratz_token):
         self.querier = StratzQuery(stratz_token)
-        self.csv_path = csv_path
         check_temp_folder()
 
-    def csv_add_match(self, match_df):
-
-        try:
-            df = pd.read_csv("temp" + os.sep + self.csv_path)
-            df = pd.concat([df, match_df])
-        except Exception as e:
-            print(e)
-            df = match_df
-        
-        df.to_csv("temp" + os.sep + self.csv_path, encoding='utf-8', index=False)
-        print(df.head())
 
     def get_match_by_id(self, id):
         match = self.querier.get_match(id)['data']
@@ -107,11 +95,10 @@ class DatasetGenerator:
 
         # get ausent json leagues
         leagues = {}
-        if not_in_json_leagues:
-            downloaded_leagues = self.querier.get_professional_league(not_in_json_leagues)['data']['leagues']
-            for d_l in downloaded_leagues:
-                with open(f'{leagues_path}{os.sep}{d_l["id"]}.json', 'w') as f:
-                    json.dump(d_l, f)
+        for to_dl_id in not_in_json_leagues:
+            d_l = self.querier.get_professional_league(to_dl_id)['data']['leagues'][0]
+            with open(f'{leagues_path}{os.sep}{d_l["id"]}.json', 'w') as f:
+                json.dump(d_l, f)
 
         # load leagues from json
         leagues = {}
