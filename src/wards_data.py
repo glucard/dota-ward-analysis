@@ -41,6 +41,9 @@ def get_df_match_wards(match:dict) -> dict:
         print(f"warning: no playbackData found for match {match['id']}")
         return
     wards = get_match_wards(match)
+    if len(wards) == 0:
+        print(f"warning: no wards found for match {match['id']}")
+        return
     df_wards = defaultdict(lambda: [])
     for id, w in wards.items():
         for key, item in w.items():
@@ -85,6 +88,7 @@ def get_leagues_df_wards(generator: DatasetGenerator, leagues_ids: dict):
         ward_matches_df = pd.concat(ward_matches_df)
         ward_matches_df['league'] = league_id
         ward_matches_df['region'] = league['region']
+        ward_matches_df['leagueName'] = league['displayName']
         df_wards.append(ward_matches_df)
     return pd.concat(df_wards)
 
@@ -116,7 +120,7 @@ class WardDataset:
 
 
     def get_by_time_merged_dataset(self):
-        df = get_leagues_df_wards(self.generator, [16842, 16840, 16841, 16839, 16843, 16844])
+        df = get_leagues_df_wards(self.generator, [16842, 16840, 16841, 16839, 16843, 16844, 16776, 16777, 16779, 16778, 16774, 16775])
         df = merge_by_time(df)
         df['positionX'] = ((df['positionX'] + WardDataset.POSITION_X_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
         df['positionY'] = ((df['positionY'] + WardDataset.POSITION_Y_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
