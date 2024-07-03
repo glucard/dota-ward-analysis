@@ -120,7 +120,7 @@ class WardDataset:
 
 
     def get_by_time_merged_dataset(self):
-        df = get_leagues_df_wards(self.generator, [16842, 16840, 16841, 16839, 16843, 16844, 16776, 16777, 16779, 16778, 16774, 16775])
+        df = get_leagues_df_wards(self.generator, [16842, 16840, 16841, 16839, 16843, 16844, 16776, 16777, 16779, 16778, 16774, 16775, 16851, 16847, 16859, 16858, 16872, 16782, 16605])
         df = merge_by_time(df)
         df['positionX'] = ((df['positionX'] + WardDataset.POSITION_X_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
         df['positionY'] = ((df['positionY'] + WardDataset.POSITION_Y_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
