@@ -47,6 +47,8 @@ class StratzQuery:
                         startDateTime
                         firstBloodTime
                         averageRank
+                        radiantNetworthLeads
+                        radiantExperienceLeads
                         players {{
                             playerSlot
                             isRadiant
@@ -71,19 +73,19 @@ class StratzQuery:
                         }}
                         playbackData {{
                             wardEvents {{
-                            indexId
-                            time
-                            positionX
-                            positionY
-                            fromPlayer
-                            wardType
-                            action
-                            playerDestroyed
+                                indexId
+                                time
+                                positionX
+                                positionY
+                                fromPlayer
+                                wardType
+                                action
+                                playerDestroyed
                             }}
                             towerDeathEvents {{
-                            time
-                            radiant
-                            dire
+                                time
+                                radiant
+                                dire
                             }}
                         }}
                         averageImp

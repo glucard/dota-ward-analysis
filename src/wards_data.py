@@ -25,7 +25,6 @@ def get_match_wards(match:dict) -> dict:
             continue
         wards[w_e['indexId']]["despawned_time"] = w_e['time']
     
-
     # get kills around
     
     return dict(wards)
@@ -68,7 +67,6 @@ def get_df_match_wards(match:dict) -> dict:
     df_wards['radiantTeam'] = match['radiantTeam']['name']
     df_wards['direTeam'] = match['direTeam']['name']
 
-
     return df_wards
 
 def get_league_df_wards(league: dict):
@@ -107,6 +105,22 @@ def merge_by_time(df):
     # Print the expanded DataFrame
     return df_expanded
 
+def get_df_match_info_by_minute(match: dict) -> pd.DataFrame:
+    df = {
+        "time": [i-2 for i in range(len(match['radiantNetworthLeads']))], # or -1
+        "radiantNetworthLeads": match['radiantNetworthLeads'],
+        "radiantExperienceLeads": match['radiantExperienceLeads'],
+        "radiantKills": match['radiantKills'],
+        "direKills": match['direKills'],
+    }
+    df = pd.DataFrame.from_dict(df)
+    df['match'] = match['id']
+    df['durationMinutes'] = match['durationSeconds'] // 60
+    df['didRadiantWin'] = match['didRadiantWin']
+    df['startDateTime'] = match['startDateTime']
+    df['firstBloodTime'] = match['firstBloodTime']
+
+    return df
 
 class WardDataset:
 
@@ -117,12 +131,35 @@ class WardDataset:
 
     def __init__(self, STRATZ_TOKEN: str):
         self.generator = DatasetGenerator(STRATZ_TOKEN)
+        self.leagues_ids = [16842, 16840, 16841, 16839, 16843, 16844, 16776, 16777, 16779, 16778, 16774, 16775]
+    
+    def get_matches_info(self):
+        leagues = self.generator.get_professional_league(self.leagues_ids)
+        dfs = []
+        for league_id, league in leagues.items():
+            matches = league['matches']
+            df = [get_df_match_info_by_minute(match) for match in matches]
+            df = pd.concat(df)
+            df['league'] = league_id
+            df['region'] = league['region']
+            df['leagueName'] = league['displayName']
+            dfs.append(df)
+        return pd.concat(dfs)
 
 
     def get_by_time_merged_dataset(self):
-        df = get_leagues_df_wards(self.generator, [16842, 16840, 16841, 16839, 16843, 16844, 16776, 16777, 16779, 16778, 16774, 16775, 16851, 16847, 16859, 16858, 16872, 16782, 16605])
+        df = get_leagues_df_wards(self.generator, self.leagues_ids)
         df = merge_by_time(df)
         df['positionX'] = ((df['positionX'] + WardDataset.POSITION_X_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
         df['positionY'] = ((df['positionY'] + WardDataset.POSITION_Y_OFFSET) * WardDataset.POSITION_RESCALER_FACTOR).astype(int)
         df['didWardWin'] = df['didRadiantWin'] == df['isRadiant']
         return df
+    
+    def get_full_dataset(self):
+        merged_df = pd.merge(
+            self.get_matches_info(),
+            self.get_by_time_merged_dataset(),
+            on=['match', 'time', 'league', 'region', 'didRadiantWin', 'leagueName'],
+            how='inner'
+        )
+        return merged_df
